@@ -5,7 +5,8 @@ import './Scoring.css'
 
 export const Scoring = () => {
   const [tiles] = useAtom(tilesAtom)
-  const scores = Object.keys(descriptions).map((key) => getScore(descriptions[key], tiles))
+  const scores = Object.keys(descriptions).map((key) => getScore(key, tiles))
+  const total = scores.reduce((a,c) => a + c, 0)
 
   return (
     <table className="scoring_container">
@@ -13,15 +14,19 @@ export const Scoring = () => {
         {Object.keys(descriptions).map((key, i) => {
           return (
             <tr key={key}>
-              <th>
+              <th key={`${key}_score`}>
                 {scores[i]}
               </th>
-              <td key={key}>
+              <td key={`${key}_description`}>
                 {descriptions[key]}
               </td>
             </tr>
           )
         })}
+        <tr key={"total"}>
+          <th key={"total_score"} style={{borderTop: "solid 1px #25272a"}}>{total}</th>
+          <td style={{borderTop: "solid 1px #25272a"}}><strong>Total</strong></td>
+        </tr>
       </tbody>
     </table>
   )

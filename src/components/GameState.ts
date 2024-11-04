@@ -6,6 +6,10 @@ const PLACEMENT_RULES = ['row1', 'row2', 'row3', 'row4', 'row5', 'row6', 'row7',
 
 export type TileStatus = typeof TILE_STATUSES[number]
 export type PlacementRule = typeof PLACEMENT_RULES[number]
+type Coord = {
+  i: number;
+  j: number;
+}
 
 export type Tile = {
   status: TileStatus
@@ -28,7 +32,7 @@ export const descriptions: Record<TileStatus, string> = {
   'house': "Houses like to be near unique other tiles (including houses)",
   'tree': "Trees like to make large contiguous groups",
   'tavern': "Taverns like to be near houses, but do not like to share",
-  'treasure': "Treasure likes to be far from the center of the map",
+  'treasure': "Treasure likes to be near treasure and far from the center of the map",
   'wizard': "Wizards like to be far from houses and taverns"
 }
 
@@ -48,7 +52,7 @@ const deckOfCards: TileOption[] = tileDeck.map((tileStatus: TileStatus, i: numbe
 
 export const deckOfCardsAtom = atom<TileOption[]>(deckOfCards)
 
-export const roundsRemianingAtom = atom<number>(3)
+export const roundsRemainingAtom = atom<number>(3)
 export const turnsRemainingAtom = atom<number>(9)
 
 export const nextOptionsAtom = atom<TileOption[]>((get) => get(deckOfCardsAtom).slice(0, 2))
@@ -81,10 +85,228 @@ export const getArtForTile = (tileStatus: TileStatus) => {
   }
 }
 
-export const getScore = (tile: TileStatus, tiles: Tile[][]): number => {
-  return 0
+export const getScore = (tileStatus: TileStatus, tiles: Tile[][]): number => {
+  let matchingTileCoords: Coord[] = []
+  tiles.forEach((row, i) => row.forEach((tile, j) => tile.status === tileStatus ? matchingTileCoords.push({ i, j } as Coord) : null))
+  switch (tileStatus) {
+    case 'dragon':
+      return getDragonScore(tiles, matchingTileCoords)
+    case 'mountain':
+      return getMountainScore(tiles, matchingTileCoords)
+    case 'river':
+      // handle longest road problem
+      return getRiverScore(tiles, matchingTileCoords)
+    case 'castle':
+      // handle distance from dragon
+      return getCastleScore(tiles, matchingTileCoords)
+    case 'wall':
+      // figure out better scoring
+      return getWallScore(tiles, matchingTileCoords)
+    case 'house':
+      return getHouseScore(tiles, matchingTileCoords)
+    case 'tree':
+      // handle contiguous
+      return getTreeScore(tiles, matchingTileCoords)
+    case 'tavern':
+      // handle house uniqueness check
+      return getTavernScore(tiles, matchingTileCoords)
+    case 'treasure':
+      // handle distance from center
+      return getTreasureScore(tiles, matchingTileCoords)
+    case 'wizard':
+      // handle distance from people
+      return getWizardScore(tiles, matchingTileCoords)
+    default:
+      return 0
+  }
 }
 
+const getTilesNear = ({i, j}: { i: number, j: number }, tiles: Tile[][]) => {
+  let resp: Tile[] = []
+  
+  if (i > 0) {
+    if (j > 0) {
+      resp.push(tiles[i - 1][j - 1])
+    }
+
+    resp.push(tiles[i - 1][j])
+
+    if (j < 8) {
+      resp.push(tiles[i - 1][j + 1])
+    }
+  }
+
+  if (j > 0) {
+    resp.push(tiles[i][j - 1])
+  }
+
+  if (j < 8) {
+    resp.push(tiles[i][j + 1])
+  }
+
+  if (i < 8) {
+    if (j > 0) {
+      resp.push(tiles[i + 1][j - 1])
+    }
+
+    resp.push(tiles[i + 1][j])
+
+    if (j < 8) {
+      resp.push(tiles[i + 1][j + 1])
+    }
+  }
+
+  return resp
+}
+
+const getDragonScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['mountain', 'treasure'])
+  const badTiles = new Set<TileStatus>(['house', 'tavern', 'castle', 'wizard'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else if (badTiles.has(tile.status)) {
+        return -1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getMountainScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['mountain', 'tree'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getRiverScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['river'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getCastleScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['treasure'])
+  const badTiles = new Set<TileStatus>(['dragon'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else if (badTiles.has(tile.status)) {
+        return -1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getWallScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['castle'])
+  const badTiles = new Set<TileStatus>(['house'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else if (badTiles.has(tile.status)) {
+        return -1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getHouseScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  return matchingTileCoords.map((coord) => {
+    const tilesNearHouse = new Set<TileStatus>(['empty'])
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (tilesNearHouse.has(tile.status)) {
+        return 0
+      } else {
+        tilesNearHouse.add(tile.status)
+        return 1
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getTreeScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['tree'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getTavernScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['house'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getTreasureScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const goodTiles = new Set<TileStatus>(['treasure'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (goodTiles.has(tile.status)) {
+        return 1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
+
+const getWizardScore = (tiles: Tile[][], matchingTileCoords: { i: number, j: number }[]): number => {
+  const badTiles = new Set<TileStatus>(['house', 'tavern'])
+
+  return matchingTileCoords.map((coord) => {
+    return getTilesNear(coord, tiles).map((tile): number => {
+      if (badTiles.has(tile.status)) {
+        return -1
+      } else {
+        return 0
+      }
+    }).reduce((arr: number, cur: number): number => arr + cur, 0)
+  }).reduce((arr: number, cur: number): number => arr + cur, 0)
+}
 
 export const getPlacementRuleMatrix = (rule: PlacementRule): Boolean[][] => {
   if (rule.startsWith("row")) {
