@@ -1,0 +1,44 @@
+.map_container {
+  border: solid 4px #c9814b;
+  padding: 0.5rem;
+  width: 23rem;
+  margin-left: 1rem;
+}
+
+.map_row {
+  display: inline-flex;
+}
+
+.tile {
+  min-width: 36px;
+  min-height: 36px;
+  border: dotted 2px #c9814b;
+  background-color: #dda963;
+  margin: 2px;
+
+  &:hover {
+    box-shadow: 0px 0px 1px 2px #c9814b;
+  }
+
+  &:active {
+    box-shadow: none;
+    background-color: #c9814b;
+
+    &:disabled {
+      background-color:#dda963;
+    }
+  }
+
+  &:disabled {
+    box-shadow: none;
+  }
+  
+  &.highlighted_tile {
+    background-color: #a7a79e;
+
+    &:active {
+      box-shadow: none;
+      background-color: #c9814b;
+    }
+  }
+}

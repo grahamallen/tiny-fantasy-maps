@@ -1,0 +1,24 @@
+.placement_rule_container {
+  font-family: monospace;
+  min-width: 9rem;
+}
+
+.placement_rule_row {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  width: 0.8rem;
+}
+
+.placement_rule_tile {
+  display: block;
+  width: 10px;
+  height: 10px;
+  background-color: #dda963;
+  margin: 1px;
+  border: solid 1px #25272a;
+}
+
+.placement_rule_filled {
+  background-color: #c9814b;
+}

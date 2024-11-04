@@ -1,0 +1,11 @@
+.game_container {
+  width: 720px;
+  height: 405px;
+  border: solid 1px #25272a;
+  background-color: #dda963;
+  color: #25272a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+}

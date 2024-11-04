@@ -1,0 +1,13 @@
+.scoring_container {
+  font-size: smaller;
+  text-align: left;
+
+  th {
+    width: 4rem;
+    text-align: center;
+  }
+
+  td {
+    margin-left: 0.5rem;
+  }
+}

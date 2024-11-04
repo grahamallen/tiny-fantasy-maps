@@ -1,0 +1,29 @@
+.option {
+  display: flex;
+  flex-direction: row;
+  flex-grow: 1;
+  justify-content: space-between;
+  align-items: center;
+  background: #dbc1af;
+  border: solid 1px #c9814b;
+  border-radius: 5px;
+  margin: 0.5rem 0px;
+  padding: 0.5rem;
+
+  &:hover {
+    box-shadow: 0 0 1px 1px #25272a;
+  }
+
+  &:active {
+    box-shadow: none;
+    background: #a7a79e;
+  }
+
+  &:has(>div>input:checked) {
+    background: #a7a79e;
+  }
+}
+
+.option_description {
+  max-width: 10rem;
+}
