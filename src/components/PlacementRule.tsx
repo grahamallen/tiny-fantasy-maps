@@ -1,10 +1,11 @@
 import React from "react";
-import { getPlacementRuleMatrix, PlacementRule } from "./GameState.ts";
+import { PlacementRule } from "./GameState.ts";
+import { getPlacementRuleMatrix } from '../utils/tiles.ts';
 import './PlacementRule.css';
 import classNames from "classnames";
 
 export const PlacementRuleComponent = ({rule}: {rule: PlacementRule}) => {
-  const placementRuleMatrix = getPlacementRuleMatrix(rule)
+  const placementRuleMatrix = getPlacementRuleMatrix(rule || 'all')
 
   return (
     <div className="placement_rule_container">

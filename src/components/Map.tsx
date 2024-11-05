@@ -1,5 +1,6 @@
 import { useAtom, useSetAtom } from "jotai"
-import { tilesAtom, Tile, chosenOptionAtom, getPlacementRuleMatrix, getArtForTile, deckOfCardsAtom, turnsRemainingAtom, roundsRemainingAtom } from "./GameState.ts"
+import { tilesAtom, Tile, chosenOptionAtom, getArtForTile, deckOfCardsAtom, turnsRemainingAtom, roundsRemainingAtom } from "./GameState.ts"
+import { getPlacementRuleMatrix } from '../utils/tiles.ts';
 import React, { useCallback, useRef } from "react";
 import './Map.css';
 import classNames from "classnames";
@@ -73,9 +74,9 @@ export const Map = () => {
           )
         })}
       </div>
-      <div className="map_copy">
-        {showCopyButton && <button onClick={handleCopyToClipboard}>Copy completed map to clipboard</button>}
-      </div>
+      {showCopyButton && <div className="map_copy">
+        <button onClick={handleCopyToClipboard}>Copy completed map to clipboard</button>
+      </div>}
     </div>
   )
 }

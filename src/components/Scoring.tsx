@@ -1,5 +1,6 @@
 import React from "react"
-import { descriptions, getScore, tilesAtom } from "./GameState.ts"
+import { descriptions, tilesAtom } from "./GameState.ts"
+import { getScore } from '../utils/scoring.ts';
 import { useAtom } from "jotai"
 import './Scoring.css'
 
@@ -7,6 +8,8 @@ export const Scoring = () => {
   const [tiles] = useAtom(tilesAtom)
   const scores = Object.keys(descriptions).map((key) => getScore(key, tiles))
   const total = scores.reduce((a,c) => a + c, 0)
+
+  console.log(JSON.stringify(tiles))
 
   return (
     <table className="scoring_container">

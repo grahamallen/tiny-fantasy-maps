@@ -1,6 +1,6 @@
 import { useAtom } from "jotai"
 import React from "react"
-import { nextOptionsAtom, turnsRemainingAtom, TileOption, roundsRemainingAtom } from "./GameState.ts"
+import { nextOptionsAtom, turnsRemainingAtom, roundsRemainingAtom } from "./GameState.ts"
 import { Option } from "./Option.tsx"
 import { Scoring } from "./Scoring.tsx"
 import { useSpring, animated } from '@react-spring/web'
@@ -17,14 +17,15 @@ export const NextOptions = () => {
 
   return (
     <animated.div className="options_container" style={{...springs}}>
-      {nextOptions.length > 0 ? nextOptions.map((nextOption: TileOption, i: number) => {
-        return (
-          <>
-            <Option key={i} option={nextOption}/>
-            {i === 0 ? (<div key={"fdjka;fdjsaklf;dsa"}>Turns Remaining: {turnsRemaining} | {roundsRemaining === 1 ? "Last Round" : `Rounds Remaining: ${roundsRemaining}`}</div>) : null}
-          </>
-        )
-      }) : <Scoring />}
+      {nextOptions.length > 0 ? (
+        <>
+          <Option option={nextOptions[0]}/>
+          <div>
+            Turns Remaining: {turnsRemaining} | {roundsRemaining === 1 ? "Last Round" : `Rounds Remaining: ${roundsRemaining}`}
+          </div>
+          <Option option={nextOptions[1]}/>
+        </>
+      ) : <Scoring />}
     </animated.div>
   )
 }
