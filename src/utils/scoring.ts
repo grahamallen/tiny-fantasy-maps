@@ -107,7 +107,7 @@ const getWallScore = (tiles: Tile[][], matchingTileCoords: Coord[]): number => {
 
   context.fillStyle = "#FFF"
   context.strokeStyle = "#000"
-  matchingTileCoords.sort(sortWallCoords).forEach((wallCoord, i) => {
+  matchingTileCoords.sort(sortWallCoords(matchingTileCoords)).forEach((wallCoord, i) => {
     if (i === 0) {
       context.beginPath()
     }
@@ -134,7 +134,6 @@ const getWallScore = (tiles: Tile[][], matchingTileCoords: Coord[]): number => {
   matchingBadTileCoords.forEach(({i: row, j: col}) => {
     // Because context has its own XY coord system, we may need to map rows and cols to it appropriately
     if (context.isPointInStroke(row, col)) {
-      console.log(row, col)
       resp -= 2
     }
   })

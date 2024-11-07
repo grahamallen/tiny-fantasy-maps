@@ -185,7 +185,7 @@ export const wallsAtom = atom<Coord[]>((get) => {
 
   context.fillStyle = "#FFF"
   context.strokeStyle = "#000"
-  wallCoords.sort(sortWallCoords)
+  wallCoords.sort(sortWallCoords(wallCoords))
   wallCoords.forEach((wallCoord, i) => {
     if (i === 0) {
       context.beginPath()

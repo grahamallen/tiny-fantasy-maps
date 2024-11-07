@@ -342,9 +342,54 @@ const lookup = (coord: Coord): number => {
   return (lookup_table[toHash(coord).toString()])
 }
 
-export const sortWallCoords = (a: Coord, b: Coord) => {
-  const lookup_a = lookup(a)
-  const lookup_b = lookup(b)
+const getMedian = (arr: number[]): number => {
+  const a = arr.slice().sort()
+  while (a.length > 2) {
+    a.pop()
+    a.shift()
+  }
 
-  return lookup_a < lookup_b ? -1 : 1
+  if (a.length === 2) {
+    return Math.floor((a[0] + a[1]) / 2)
+  }
+  return a[0]
+}
+
+const transform = (coord: Coord, median: Coord): Coord => {
+  return {
+    i: Math.min(Math.max(coord.i - median.i + 4, 0), 8),
+    j: Math.min(Math.max(coord.j - median.j + 4, 0), 8)
+  }
+}
+
+export const sortWallCoords = (wallCoords: Coord[]): (a: Coord, b: Coord) => number => {
+  // Normally, our lookup table assumes the points are distributed around 4,4 as the "origin" of the polar coordinate system
+  // and tries to order them clockwise around that origin.
+
+  // But if a set of walls is like this X.X......
+  // then we don't have a way of making .........
+  // sure that the points are in the    X.X......
+  // right order unless we shift those  .........
+  // points to be around the "origin"   .........
+  // of our lookup table, which is at   .........
+  // {4,4}. To get there, we can take   .........
+  // the median of all the points and   .........
+  // make that our "origin" instead.    .........
+
+  // This can be done by i_original - i_median + 4, but that can wind up outside of the bounds of the grid for points in the NW
+  // so we can ensure that it doesn't go off the grid by just using 0 as the lowest and 8 as the highest i or j value
+  const median: Coord = {
+    i: getMedian(wallCoords.map(w => w.i)),
+    j: getMedian(wallCoords.map(w => w.j))
+  }
+
+  return (a: Coord, b: Coord): number => { 
+    const transformed_a = transform(a, median)
+    const transformed_b = transform(b, median)
+
+    const lookup_a = lookup(transformed_a)
+    const lookup_b = lookup(transformed_b)
+    
+    return lookup_a < lookup_b ? -1 : 1
+  }
 }
