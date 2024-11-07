@@ -40,6 +40,10 @@
   &:disabled {
     box-shadow: none;
   }
+
+  &.wall_area_tile {
+    border: solid #cf6a4f;
+  }
   
   &.highlighted_tile {
     background-color: #a7a79e;

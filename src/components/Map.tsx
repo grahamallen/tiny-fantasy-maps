@@ -1,5 +1,5 @@
-import { useAtom, useSetAtom } from "jotai"
-import { tilesAtom, Tile, chosenOptionAtom, getArtForTile, deckOfCardsAtom, turnsRemainingAtom, roundsRemainingAtom } from "./GameState.ts"
+import { useAtom, useAtomValue, useSetAtom } from "jotai"
+import { tilesAtom, Tile, chosenOptionAtom, getArtForTile, deckOfCardsAtom, turnsRemainingAtom, roundsRemainingAtom, wallsAtom } from "./GameState.ts"
 import { getPlacementRuleMatrix } from '../utils/tiles.ts';
 import React, { useCallback, useRef } from "react";
 import './Map.css';
@@ -17,6 +17,7 @@ export const Map = () => {
   const isDisabled = (row: number, col: number): boolean => {
     return chosenOption === null || !ruleMatrix[row][col] || tiles[row][col].status !== 'empty'
   }
+  const wallAreaCoords = useAtomValue(wallsAtom)
 
   const handleTilePlacement = useCallback((row_i: number, col_i: number) => {
     if (chosenOption != null && tiles[row_i][col_i].status === 'empty') {
@@ -59,7 +60,7 @@ export const Map = () => {
               {row.map((tile: Tile, col_i: number) => {
                 return (
                   <button 
-                  className={classNames("tile", { "highlighted_tile": !isDisabled(row_i, col_i) })}
+                  className={classNames("tile", { "highlighted_tile": !isDisabled(row_i, col_i), "wall_area_tile": wallAreaCoords.some(({i,j}) => i === row_i && j === col_i) })}
                   disabled={isDisabled(row_i, col_i)} 
                   key={`${row_i}_${col_i}`}
                   onClick={() => handleTilePlacement(row_i, col_i)}

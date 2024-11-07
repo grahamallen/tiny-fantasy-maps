@@ -1,13 +1,13 @@
 import React from "react"
-import { descriptions, tilesAtom } from "./GameState.ts"
+import { descriptions, scores, tilesAtom } from "./GameState.ts"
 import { getScore } from '../utils/scoring.ts';
 import { useAtom } from "jotai"
 import './Scoring.css'
 
 export const Scoring = () => {
   const [tiles] = useAtom(tilesAtom)
-  const scores = Object.keys(descriptions).map((key) => getScore(key, tiles))
-  const total = scores.reduce((a,c) => a + c, 0)
+  const scoreTotals = Object.keys(descriptions).map((key) => getScore(key, tiles))
+  const total = scoreTotals.reduce((a,c) => a + c, 0)
 
   return (
     <table className="scoring_container">
@@ -16,10 +16,10 @@ export const Scoring = () => {
           return (
             <tr key={key}>
               <th key={`${key}_score`}>
-                {scores[i]}
+                {scoreTotals[i]}
               </th>
               <td key={`${key}_description`}>
-                {descriptions[key]}
+                {scores[key]}
               </td>
             </tr>
           )
