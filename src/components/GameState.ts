@@ -26,7 +26,7 @@ export interface TileOption {
 export const descriptions: Record<TileStatus, string> = {
   'dragon': "Dragons like to be near mountains and gold, and far from people",
   'mountain': "Mountains like to be near trees and rivers",
-  'river': "Rivers like to make long, continuous, non-overlapping lines",
+  'river': "Rivers like to make long, continuous, diagonally-nearby lines",
   'castle': "Castles like to have large kingdoms (far from walls, houses, or taverns)",
   'wall': "Walls like to enclose castles but not houses or taverns",
   'house': "Houses like to be near unique other tiles (including houses)",
@@ -38,14 +38,14 @@ export const descriptions: Record<TileStatus, string> = {
 
 export const scores: Record<TileStatus, string> = {
   'dragon': "2pts per nearby mountain/gold, 1pt per square away from nearest house/tavern/castle/wizard",
+  'treasure': "1pt per treasure + 1pt per square away from center",
   'mountain': "2pts per nearby tree/river",
   'river': "2pts per river along a nearby continous line -2pts (river alone gets 0)",
-  'castle': "1pt per square away from closest wall/house/tavern",
-  'wall': "10pts for enclosing a castle, -2 for each enclosed house/tavern",
-  'house': "1pt per unique tile nearby",
   'tree': "2pts per tree in an adjacent group -2pts (tree alone gets 0)",
+  'wall': "10pts for enclosing a castle, -2 for each enclosed house/tavern",
+  'castle': "1pt per square away from closest wall/house/tavern",
+  'house': "1pt per unique tile nearby",
   'tavern': "2pts per house near tavern, 0 if house already has a tavern",
-  'treasure': "1pt per treasure + 1pt per square away from center",
   'wizard': "2pt per square away from nearest house/tavern"
 }
 

@@ -9,8 +9,6 @@ export const Scoring = () => {
   const scores = Object.keys(descriptions).map((key) => getScore(key, tiles))
   const total = scores.reduce((a,c) => a + c, 0)
 
-  console.log(JSON.stringify(tiles))
-
   return (
     <table className="scoring_container">
       <tbody>

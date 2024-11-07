@@ -19,11 +19,11 @@ export const getCoordsNear = ({i, j}: Coord, includeDiagonals: Boolean = true): 
     }
   }
 
-  if (j > 0 && includeDiagonals) {
+  if (j > 0) {
     resp.push({i: i, j: j - 1})
   }
 
-  if (j < 8 && includeDiagonals) {
+  if (j < 8) {
     resp.push({i: i, j: j + 1})
   }
 
@@ -44,26 +44,15 @@ export const getCoordsNear = ({i, j}: Coord, includeDiagonals: Boolean = true): 
 
 export const getClosestTileOfTypes = (tiles: Tile[][], coord: Coord, types: Set<TileStatus>) => {
   let min = 0;
-  for (let i = 9 * 2 - 1; i >= 0; i--) {
+  for (let i = 1; i < 9 * 2; i++) {
     const tilesAtDistance = getCoordsByManhattanDistance(tiles, i, coord).map(({i, j}) => tiles[i][j])
     const containsType = tilesAtDistance.find((tile) => types.has(tile.status))
     if (containsType) {
       min = i
+      break;
     }
   }
   return min
-}
-
-export const getFurthestTileOfTypes = (tiles: Tile[][], coord: Coord, types: Set<TileStatus>) => {
-  let max = 0;
-  for (let i = 0; i < 9 * 2; i++) {
-    const tilesAtDistance = getCoordsByManhattanDistance(tiles, i, coord).map(({i, j}) => tiles[i][j])
-    const containsType = tilesAtDistance.find((tile) => types.has(tile.status))
-    if (containsType) {
-      max = i
-    }
-  }
-  return max
 }
 
 const getCoordsByManhattanDistance = (tiles: Tile[][], distance: number, coord: Coord): Coord[] => {
