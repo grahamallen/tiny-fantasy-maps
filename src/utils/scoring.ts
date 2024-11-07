@@ -17,7 +17,6 @@ export const getScore = (tileStatus: TileStatus, tiles: Tile[][]): number => {
     case 'tree':
       return getTreeScore(tiles, matchingTileCoords)
     case 'wall':
-      // TODO: handle grid position in shape algorithm
       return getWallScore(tiles, matchingTileCoords)
     case 'castle':
       return getCastleScore(tiles, matchingTileCoords)

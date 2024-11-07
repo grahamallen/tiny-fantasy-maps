@@ -43,11 +43,11 @@ export const scores: Record<TileStatus, string> = {
   'mountain': "2pts per nearby tree/river",
   'river': "3pts per river along a diagonally-nearby continous line -3pts (river alone gets 0)",
   'tree': "2pts per tree in an adjacent group -2pts (tree alone gets 0)",
-  'wall': "10pts for enclosing a castle, -2 for each enclosed house/tavern",
+  'wall': "10pts for enclosing a castle, -2pts for each enclosed house/tavern",
   'castle': "1pt per square away from closest wall/house/tavern",
   'house': "1pt per unique tile nearby",
   'tavern': "2pts per house near tavern, 0 if house already has a tavern",
-  'wizard': "2pt per square away from nearest house/tavern"
+  'wizard': "2pts per square away from nearest house/tavern"
 }
 
 const placementDeckCut: number = Math.ceil(Math.random() * 26) // Cut the deck between 1/27 and 26/27 of the way through
