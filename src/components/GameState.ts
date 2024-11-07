@@ -49,8 +49,19 @@ export const scores: Record<TileStatus, string> = {
   'wizard': "2pt per square away from nearest house/tavern"
 }
 
-const placementDeck: PlacementRule[] = shuffle(PLACEMENT_RULES.slice(0, 27).concat(PLACEMENT_RULES.slice(0, 27)))
-const tileDeck: TileStatus[] = shuffle(TILE_STATUSES.slice(1).concat(TILE_STATUSES.slice(2), TILE_STATUSES.slice(4), TILE_STATUSES.slice(4), TILE_STATUSES.slice(4), TILE_STATUSES.slice(4), TILE_STATUSES.slice(4))) //10 + 9 + 7 + 7 + 7 + 7 + 7
+const placementDeckCut: number = Math.ceil(Math.random() * 26) // Cut the deck between 1/27 and 26/27 of the way through
+const placementDeck: PlacementRule[] = PLACEMENT_RULES.slice(placementDeckCut).concat(
+  PLACEMENT_RULES.slice(0, 27),
+  PLACEMENT_RULES.slice(0, placementDeckCut) // Put the remaining cards from the cut at the bottom
+)
+const tileDeck: TileStatus[] = TILE_STATUSES.slice(1).concat(
+  TILE_STATUSES.slice(2), 
+  TILE_STATUSES.slice(4), 
+  TILE_STATUSES.slice(4), 
+  TILE_STATUSES.slice(4), 
+  TILE_STATUSES.slice(4), 
+  TILE_STATUSES.slice(4)
+).sort() //10 + 9 + 7 + 7 + 7 + 7 + 7 = 54 with exactly 1 wizard, 2 dragons, and 2 castles
 
 const getTileDeck = (i: number = 0): TileOption[] => {
   const toHash = (tileStatus: TileStatus, rule: PlacementRule) => {
@@ -111,7 +122,7 @@ const getTileDeck = (i: number = 0): TileOption[] => {
     j++
   }
 
-  return resp
+  return shuffle(resp)
 }
 
 const deckOfCards: TileOption[] = getTileDeck()
