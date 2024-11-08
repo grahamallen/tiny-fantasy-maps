@@ -51,7 +51,7 @@ jobs:
     - name: deploy to github
       run: |
         npm install
-        npm deploy
+        npm run deploy
 
     - name: Zip the contents for publishing
       run: |
