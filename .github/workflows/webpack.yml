@@ -22,7 +22,7 @@ jobs:
       - name: Push the tag if it is new
         id: tag
         run: |
-          LATEST_TAG="$(git describe --tags --abbrev=0)"
+          LATEST_TAG="{$(git describe --tags --abbrev=0):-0.0.0"
           CALCULATED_TAG="$(npm pkg get version --workspaces=false | tr -d \")"
           if [[ "${LATEST_TAG}" != "${CALCULATED_TAG}" ]]; then
               git tag ${CALCULATED_TAG}
