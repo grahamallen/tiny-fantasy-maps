@@ -1,0 +1,109 @@
+name: Release to Itchio
+
+on:
+  push:
+    tags:
+      - v*
+
+jobs:
+  tag:
+    permissions:
+      contents: write
+
+    outputs:
+      new_tag: ${{ steps.tag.outputs.new_tag }}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+          fetch-depth: 0
+      - name: Push the tag if it is new
+        id: tag
+        run: |
+          LATEST_TAG="$(git describe --tags --abbrev=0)"
+          CALCULATED_TAG="$(npm pkg get version --workspaces=false | tr -d \")"
+          if [[ "${LATEST_TAG}" != "${CALCULATED_TAG}" ]]; then
+              git tag ${CALCULATED_TAG}
+              git push origin ${CALCULATED_TAG}
+              echo "new_tag=${CALCULATED_TAG}" >> "$GITHUB_OUTPUT"
+          else
+              echo "new_tag=" >> "$GITHUB_OUTPUT"
+          fi
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x, 22.x]
+    
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ matrix.node-version }}
+
+    - name: webpack build
+      run: |
+        npm install
+        npx webpack
+
+  github-publish:
+    needs: build
+    permissions:
+      pages: write # to deploy to Pages
+      id-token: write # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{steps.deployment.outputs.page_url}}
+
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the web-build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5.0.0
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3.0.1
+        with:
+          path: .
+      - name: Deploy GitHub Pages site
+        id: deployment
+        uses: actions/deploy-pages@v4.0.5
+
+  itchio-publish:
+    needs: [tag, build]
+  
+    if: needs.tag.outputs.new_tag != ''
+  
+    environment:
+      name: "anvilfood itch.io production"
+      url: https://anvilfood.itch.io/tiny-fantasy-maps
+  
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download the web-build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: web-build
+      - name: Zip the contents for publishing
+        run: |
+          zip -r web-build.zip .
+      - name: Publish to Itch.io
+        uses: Ayowel/butler-to-itch@v1.0.0
+        with:
+          butler_key: ${{ secrets.ITCHIO_API_KEY }}
+          itch_user: anvilfood
+          itch_game: tiny-fantasy-maps
+          version: ${{ github.ref_name }}
+          files: "web-build.zip"
+      
