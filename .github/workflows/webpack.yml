@@ -48,61 +48,20 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
 
-    - name: react-scripts build
+    - name: deploy to github
       run: |
         npm install
-        npm run build
+        npm deploy
 
-  github-publish:
-    needs: build
-    permissions:
-      pages: write # to deploy to Pages
-      id-token: write # to verify the deployment originates from an appropriate source
-
-    environment:
-      name: github-pages
-      url: ${{steps.deployment.outputs.page_url}}
-
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download the web-build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5.0.0
-      - name: Upload GitHub Pages artifact
-        uses: actions/upload-pages-artifact@v3.0.1
-        with:
-          path: .
-      - name: Deploy GitHub Pages site
-        id: deployment
-        uses: actions/deploy-pages@v4.0.5
-
-  itchio-publish:
-    needs: [tag, build]
-  
-    if: needs.tag.outputs.new_tag != ''
-  
-    environment:
-      name: "anvilfood itch.io production"
-      url: https://anvilfood.itch.io/tiny-fantasy-maps
-  
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download the web-build artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: web-build
-      - name: Zip the contents for publishing
-        run: |
-          zip -r web-build.zip .
-      - name: Publish to Itch.io
-        uses: Ayowel/butler-to-itch@v1.0.0
-        with:
-          butler_key: ${{ secrets.ITCHIO_API_KEY }}
-          itch_user: anvilfood
-          itch_game: tiny-fantasy-maps
-          version: ${{ github.ref_name }}
-          files: "web-build.zip"
-      
+    - name: Zip the contents for publishing
+      run: |
+        zip -r web-build.zip ./build/
+    - name: Publish to Itch.io
+      uses: Ayowel/butler-to-itch@v1.0.0
+      with:
+        butler_key: ${{ secrets.ITCHIO_API_KEY }}
+        itch_user: anvilfood
+        itch_game: tiny-fantasy-maps
+        version: ${{ github.ref_name }}
+        files: "web-build.zip"
+    
