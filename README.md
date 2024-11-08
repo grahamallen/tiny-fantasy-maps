@@ -7,8 +7,8 @@ Once I get github actions to work nicely, you'll be able to play the latest depl
 
 There are all sorts of additional pieces that I'd like to get to:
 
-- Animations (as an excuse to relearn react-spring) to make scoring more intuitive
-- Additional design for the interludes between rounds of 9 tiles
-- Art for the tiles rather than relying on emoji
-- Better tutorialization for people who haven't played tiny islands before
-- Daily shuffle and/or random seed selection implementation
+- [ ] Animations (as an excuse to relearn react-spring) to make scoring more intuitive
+- [ ] Additional design for the interludes between rounds of 9 tiles
+- [ ] Art for the tiles rather than relying on emoji
+- [ ] Better tutorialization for people who haven't played tiny islands before
+- [ ] Daily shuffle and/or random seed selection implementation
