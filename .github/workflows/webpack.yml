@@ -2,8 +2,7 @@ name: Release to Itchio
 
 on:
   push:
-    tags:
-      - v*
+    branches: [main]
 
 jobs:
   tag:
