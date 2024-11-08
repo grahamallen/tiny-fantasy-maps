@@ -60,7 +60,10 @@ export const Map = () => {
               {row.map((tile: Tile, col_i: number) => {
                 return (
                   <button 
-                  className={classNames("tile", { "highlighted_tile": !isDisabled(row_i, col_i), "wall_area_tile": wallAreaCoords.some(({i,j}) => i === row_i && j === col_i) })}
+                  className={classNames("tile", `tile_${tile.status}`, { 
+                    "highlighted_tile": !isDisabled(row_i, col_i), 
+                    "wall_area_tile": wallAreaCoords.some(({i,j}) => i === row_i && j === col_i) 
+                  })}
                   disabled={isDisabled(row_i, col_i)} 
                   key={`${row_i}_${col_i}`}
                   onClick={() => handleTilePlacement(row_i, col_i)}
